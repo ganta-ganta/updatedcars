@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment - GoPanda Cars</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <!-- Header -->
+  <header class="bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark container">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="fas fa-car me-2"></i>
+          <h1 class="d-inline m-0">GoPanda Cars</h1>
+        </a>
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="index.html">
+            <i class="fas fa-arrow-left me-1"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="container py-5">
+    <div id="loadingSection" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading booking details...</p>
+    </div>
+
+    <div id="paymentSection" style="display: none;">
+      <!-- Back Button -->
+      <div class="mb-4">
+        <a href="bookings.html" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i> Back to Bookings
+        </a>
+      </div>
+
+      <!-- Payment Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas fa-credit-card fa-3x text-primary mb-3"></i>
+              <h2 class="fw-bold">Complete Your Payment</h2>
+              <p class="text-muted">Booking ID: <span id="displayBookingId" class="fw-bold"></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Booking Summary -->
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-file-invoice me-2"></i> Booking Summary
+              </h5>
+            </div>
+            <div class="card-body">
+              <div id="bookingSummary">
+                <!-- Booking details will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Instructions -->
+        <div class="col-lg-6 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-university me-2"></i> Bank Transfer Details
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Important:</strong> We only accept bank transfers. Please transfer the exact amount.
+              </div>
+              
+              <div class="bank-details">
+                <div class="detail-item mb-3">
+                  <label class="fw-bold text-muted">Account Number:</label>
+                  <div class="d-flex align-items-center">
+                    <span class="fw-bold fs-5 me-2" id="accountNumber"></span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('accountNumber')">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="detail-item mb-3">
+                  <label class="fw-bold text-muted">IFSC Code:</label>
+                  <div class="d-flex align-items-center">
+                    <span class="fw-bold fs-5 me-2" id="ifscCode"></span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('ifscCode')">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="detail-item mb-3">
+                  <label class="fw-bold text-muted">Beneficiary Name:</label>
+                  <div class="fw-bold" id="beneficiaryName"></div>
+                </div>
+                
+                <div class="detail-item mb-3">
+                  <label class="fw-bold text-muted">Bank Name:</label>
+                  <div class="fw-bold" id="bankName"></div>
+                </div>
+                
+                <div class="detail-item mb-3">
+                  <label class="fw-bold text-muted">Branch:</label>
+                  <div class="fw-bold" id="branchName"></div>
+                </div>
+              </div>
+
+              <div class="alert alert-warning mt-3">
+                <h6 class="fw-bold mb-2">
+                  <i class="fas fa-exclamation-triangle me-2"></i> Payment Instructions:
+                </h6>
+                <ul class="mb-0 small">
+                  <li>Transfer the exact amount: <span id="exactAmount" class="fw-bold"></span></li>
+                  <li>Use your booking ID as reference: <span id="referenceId" class="fw-bold"></span></li>
+                  <li>Upload payment proof after transfer</li>
+                  <li>We will verify payment within 2-4 hours</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Proof Submission -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+              <h5 class="mb-0">
+                <i class="fas fa-upload me-2"></i> Submit Payment Proof
+              </h5>
+            </div>
+            <div class="card-body">
+              <form id="paymentProofForm">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="transactionId" class="form-label">
+                      <i class="fas fa-hashtag me-1"></i> Transaction ID / UTR Number *
+                    </label>
+                    <input type="text" class="form-control" id="transactionId" required 
+                           placeholder="Enter transaction ID">
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="paymentProof" class="form-label">
+                      <i class="fas fa-image me-1"></i> Payment Screenshot (Optional)
+                    </label>
+                    <input type="file" class="form-control" id="paymentProof" accept="image/*">
+                    <div class="form-text">Max file size: 5MB</div>
+                  </div>
+                </div>
+                
+                <div class="text-center">
+                  <button type="submit" class="btn btn-success btn-lg px-5" id="submitProofBtn">
+                    <i class="fas fa-check-circle me-2"></i> Submit Payment Proof
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Section -->
+    <div id="errorSection" style="display: none;" class="text-center py-5">
+      <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+      <h3>Booking Not Found</h3>
+      <p class="text-muted">The booking you're looking for doesn't exist or has been removed.</p>
+      <a href="index.html" class="btn btn-primary">Go to Home</a>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let currentBooking = null;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingId = urlParams.get('bookingId');
+      
+      if (!bookingId) {
+        showError();
+        return;
+      }
+      
+      loadBookingDetails(bookingId);
+      setupEventListeners();
+    });
+    
+    function setupEventListeners() {
+      const paymentProofForm = document.getElementById('paymentProofForm');
+      if (paymentProofForm) {
+        paymentProofForm.addEventListener('submit', handlePaymentProofSubmission);
+      }
+    }
+    
+    async function loadBookingDetails(bookingId) {
+      try {
+        const bookingDoc = await db.collection('bookings').doc(bookingId).get();
+        
+        if (!bookingDoc.exists) {
+          showError();
+          return;
+        }
+        
+        currentBooking = { id: bookingDoc.id, ...bookingDoc.data() };
+        displayBookingDetails();
+        displayPaymentDetails();
+        
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('paymentSection').style.display = 'block';
+        
+      } catch (error) {
+        console.error('Error loading booking:', error);
+        showError();
+      }
+    }
+    
+    function displayBookingDetails() {
+      if (!currentBooking) return;
+      
+      document.getElementById('displayBookingId').textContent = currentBooking.bookingId;
+      
+      const summaryHtml = `
+        <div class="booking-detail">
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-car me-2 text-primary"></i>Car:</span>
+            <span class="fw-bold">${currentBooking.carName}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-user me-2 text-primary"></i>Customer:</span>
+            <span class="fw-bold">${currentBooking.userName}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-phone me-2 text-primary"></i>Phone:</span>
+            <span class="fw-bold">${currentBooking.userPhone}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-calendar me-2 text-primary"></i>Start Date:</span>
+            <span class="fw-bold">${formatDate(currentBooking.startDate)}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-calendar me-2 text-primary"></i>End Date:</span>
+            <span class="fw-bold">${formatDate(currentBooking.endDate)}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-clock me-2 text-primary"></i>Duration:</span>
+            <span class="fw-bold">${currentBooking.totalDays} days (${currentBooking.totalHours} hours)</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="fas fa-cog me-2 text-primary"></i>Rental Option:</span>
+            <span class="fw-bold">${currentBooking.rentalOption}</span>
+          </div>
+          ${currentBooking.discountAmount > 0 ? `
+          <div class="d-flex justify-content-between mb-2 text-success">
+            <span><i class="fas fa-tag me-2"></i>Discount:</span>
+            <span class="fw-bold">-₹${currentBooking.discountAmount}</span>
+          </div>
+          ` : ''}
+          <hr>
+          <div class="d-flex justify-content-between fs-5">
+            <span class="fw-bold"><i class="fas fa-rupee-sign me-2 text-success"></i>Total Amount:</span>
+            <span class="fw-bold text-success">₹${currentBooking.finalPrice}</span>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('bookingSummary').innerHTML = summaryHtml;
+    }
+    
+    function displayPaymentDetails() {
+      document.getElementById('accountNumber').textContent = paymentDetails.accountNumber;
+      document.getElementById('ifscCode').textContent = paymentDetails.ifsc;
+      document.getElementById('beneficiaryName').textContent = paymentDetails.beneficiaryName;
+      document.getElementById('bankName').textContent = paymentDetails.bankName;
+      document.getElementById('branchName').textContent = paymentDetails.branch;
+      document.getElementById('exactAmount').textContent = `₹${currentBooking.finalPrice}`;
+      document.getElementById('referenceId').textContent = currentBooking.bookingId;
+    }
+    
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      const text = element.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Show success feedback
+        const button = element.nextElementSibling;
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check text-success"></i>';
+        
+        setTimeout(() => {
+          button.innerHTML = originalIcon;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    }
+    
+    async function handlePaymentProofSubmission(e) {
+      e.preventDefault();
+      
+      const transactionId = document.getElementById('transactionId').value.trim();
+      const paymentProofFile = document.getElementById('paymentProof').files[0];
+      const submitBtn = document.getElementById('submitProofBtn');
+      const originalText = submitBtn.innerHTML;
+      
+      if (!transactionId) {
+        alert('Please enter transaction ID');
+        return;
+      }
+      
+      showLoading(submitBtn);
+      
+      try {
+        let paymentProofUrl = '';
+        
+        // Upload payment proof if provided
+        if (paymentProofFile) {
+          if (paymentProofFile.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            return;
+          }
+          
+          const storageRef = storage.ref(`payment-proofs/${currentBooking.id}-${Date.now()}`);
+          const uploadTask = await storageRef.put(paymentProofFile);
+          paymentProofUrl = await uploadTask.ref.getDownloadURL();
+        }
+        
+        // Update booking with payment proof
+        await db.collection('bookings').doc(currentBooking.id).update({
+          status: 'payment_submitted',
+          paymentProof: paymentProofUrl,
+          paymentTransactionId: transactionId,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Show success message
+        alert('Payment proof submitted successfully! We will verify and confirm your booking soon.');
+        window.location.href = 'bookings.html';
+        
+      } catch (error) {
+        console.error('Error submitting payment proof:', error);
+        alert('Error submitting payment proof. Please try again.');
+      } finally {
+        hideLoading(submitBtn, originalText);
+      }
+    }
+    
+    function showError() {
+      document.getElementById('loadingSection').style.display = 'none';
+      document.getElementById('errorSection').style.display = 'block';
+    }
+    
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  </script>
+</body>
+</html>
