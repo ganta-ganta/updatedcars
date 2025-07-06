@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - GoPanda Cars</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <!-- Header -->
+  <header class="bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark container">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+          <i class="fas fa-car me-2"></i>
+          <h1 class="d-inline m-0">GoPanda Cars</h1>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="profile.html">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="bookings.html">My Bookings</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="admin.html">Admin</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="loginLink">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="container-fluid py-4">
+    <!-- Loading Section -->
+    <div id="loadingSection" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading dashboard...</p>
+    </div>
+
+    <!-- Access Denied Section -->
+    <div id="accessDeniedSection" style="display: none;" class="text-center py-5">
+      <i class="fas fa-user-shield fa-4x text-danger mb-4"></i>
+      <h3>Access Denied</h3>
+      <p class="text-muted mb-4">Admin privileges required to access this page</p>
+      <a href="index.html" class="btn btn-primary">Go to Home</a>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" style="display: none;">
+      <!-- Page Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1 class="fw-bold">Admin Dashboard</h1>
+          <p class="text-muted">Manage bookings, payments, and users</p>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-calendar fa-2x me-3"></i>
+                <div>
+                  <h6 class="card-title mb-0">Today's Bookings</h6>
+                  <h3 class="mb-0" id="todayBookings">0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card bg-success text-white h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-rupee-sign fa-2x me-3"></i>
+                <div>
+                  <h6 class="card-title mb-0">Total Revenue</h6>
+                  <h3 class="mb-0" id="totalRevenue">₹0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-clock fa-2x me-3"></i>
+                <div>
+                  <h6 class="card-title mb-0">Pending Payments</h6>
+                  <h3 class="mb-0" id="pendingPayments">0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card bg-info text-white h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-users fa-2x me-3"></i>
+                <div>
+                  <h6 class="card-title mb-0">Total Users</h6>
+                  <h3 class="mb-0" id="totalUsers">0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                <i class="fas fa-chart-line me-2"></i>Overview
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab">
+                <i class="fas fa-list me-2"></i>All Bookings
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">
+                <i class="fas fa-credit-card me-2"></i>Payment Verification
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                <i class="fas fa-users me-2"></i>Users
+              </button>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="card-body">
+          <div class="tab-content" id="adminTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+              <h5 class="mb-3">Recent Bookings</h5>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>Customer</th>
+                      <th>Car</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentBookingsTable">
+                    <!-- Recent bookings will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- All Bookings Tab -->
+            <div class="tab-pane fade" id="bookings" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">All Bookings</h5>
+                <button class="btn btn-outline-primary btn-sm" onclick="refreshBookings()">
+                  <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Booking Details</th>
+                      <th>Customer</th>
+                      <th>Dates</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="allBookingsTable">
+                    <!-- All bookings will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Payment Verification Tab -->
+            <div class="tab-pane fade" id="payments" role="tabpanel">
+              <h5 class="mb-3">Payment Verification</h5>
+              <div id="pendingPaymentsContainer">
+                <!-- Pending payments will be populated here -->
+              </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="tab-pane fade" id="users" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Users</h5>
+                <button class="btn btn-outline-primary btn-sm" onclick="refreshUsers()">
+                  <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Contact</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTable">
+                    <!-- Users will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let allBookings = [];
+    let allUsers = [];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAdminAccess();
+    });
+    
+    function checkAdminAccess() {
+      auth.onAuthStateChanged(async (user) => {
+        document.getElementById('loadingSection').style.display = 'none';
+        
+        if (user) {
+          try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              currentUser = { uid: user.uid, ...userData };
+              updateNavigation(true);
+              
+              if (userData.role === 'admin') {
+                document.getElementById('adminDashboard').style.display = 'block';
+                await loadDashboardData();
+              } else {
+                showAccessDenied();
+              }
+            } else {
+              showAccessDenied();
+            }
+          } catch (error) {
+            console.error('Error checking admin access:', error);
+            showAccessDenied();
+          }
+        } else {
+          showAccessDenied();
+        }
+      });
+    }
+    
+    function showAccessDenied() {
+      document.getElementById('accessDeniedSection').style.display = 'block';
+      updateNavigation(false);
+    }
+    
+    async function loadDashboardData() {
+      try {
+        await Promise.all([
+          loadBookings(),
+          loadUsers()
+        ]);
+        
+        calculateStats();
+        displayRecentBookings();
+        displayAllBookings();
+        displayPendingPayments();
+        displayUsers();
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+    
+    async function loadBookings() {
+      const bookingsSnapshot = await db.collection('bookings')
+        .orderBy('createdAt', 'desc')
+        .get();
+      
+      allBookings = bookingsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    }
+    
+    async function loadUsers() {
+      const usersSnapshot = await db.collection('users')
+        .orderBy('createdAt', 'desc')
+        .get();
+      
+      allUsers = usersSnapshot.docs.map(doc => ({
+        uid: doc.id,
+        ...doc.data()
+      }));
+    }
+    
+    function calculateStats() {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      // Today's bookings
+      const todayBookings = allBookings.filter(booking => {
+        if (!booking.createdAt) return false;
+        const bookingDate = new Date(booking.createdAt.toDate()).toISOString().split('T')[0];
+        return bookingDate === todayStr;
+      });
+      
+      // Total revenue (verified payments only)
+      const totalRevenue = allBookings
+        .filter(booking => booking.status === 'payment_verified' || booking.status === 'confirmed')
+        .reduce((sum, booking) => sum + (booking.finalPrice || 0), 0);
+      
+      // Pending payments
+      const pendingPayments = allBookings.filter(booking => booking.status === 'payment_submitted').length;
+      
+      // Update UI
+      document.getElementById('todayBookings').textContent = todayBookings.length;
+      document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toLocaleString()}`;
+      document.getElementById('pendingPayments').textContent = pendingPayments;
+      document.getElementById('totalUsers').textContent = allUsers.length;
+    }
+    
+    function displayRecentBookings() {
+      const recentBookings = allBookings.slice(0, 10);
+      const tableBody = document.getElementById('recentBookingsTable');
+      
+      tableBody.innerHTML = recentBookings.map(booking => `
+        <tr>
+          <td class="fw-bold">${booking.bookingId}</td>
+          <td>${booking.userName}</td>
+          <td>${booking.carName}</td>
+          <td>₹${booking.finalPrice}</td>
+          <td><span class="badge ${getStatusBadgeClass(booking.status)}">${formatStatus(booking.status)}</span></td>
+          <td>${booking.createdAt ? new Date(booking.createdAt.toDate()).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+    
+    function displayAllBookings() {
+      const tableBody = document.getElementById('allBookingsTable');
+      
+      tableBody.innerHTML = allBookings.map(booking => `
+        <tr>
+          <td>
+            <div class="fw-bold">${booking.bookingId}</div>
+            <small class="text-muted">${booking.carName}</small>
+          </td>
+          <td>
+            <div class="fw-bold">${booking.userName}</div>
+            <small class="text-muted">${booking.userPhone}</small>
+          </td>
+          <td>
+            <small>${formatDate(booking.startDate)} to ${formatDate(booking.endDate)}</small>
+          </td>
+          <td class="fw-bold">₹${booking.finalPrice}</td>
+          <td><span class="badge ${getStatusBadgeClass(booking.status)}">${formatStatus(booking.status)}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" onclick="viewBookingDetails('${booking.id}')">
+              <i class="fas fa-eye"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function displayPendingPayments() {
+      const pendingPayments = allBookings.filter(booking => booking.status === 'payment_submitted');
+      const container = document.getElementById('pendingPaymentsContainer');
+      
+      if (pendingPayments.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h5>No Pending Payments</h5>
+            <p class="text-muted">All payments have been verified</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = pendingPayments.map(booking => `
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h6 class="fw-bold mb-1">${booking.bookingId}</h6>
+                <p class="mb-1">${booking.carName} | ${booking.userName}</p>
+                <small class="text-muted">
+                  Amount: ₹${booking.finalPrice}
+                  ${booking.paymentTransactionId ? ` | Transaction ID: ${booking.paymentTransactionId}` : ''}
+                </small>
+              </div>
+              <div class="col-md-4 text-end">
+                <button class="btn btn-success btn-sm me-2" onclick="verifyPayment('${booking.id}', 'approve')">
+                  <i class="fas fa-check me-1"></i> Approve
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="verifyPayment('${booking.id}', 'reject')">
+                  <i class="fas fa-times me-1"></i> Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function displayUsers() {
+      const tableBody = document.getElementById('usersTable');
+      
+      tableBody.innerHTML = allUsers.map(user => `
+        <tr>
+          <td>
+            <div class="fw-bold">${user.name}</div>
+            <small class="text-muted">${user.email}</small>
+          </td>
+          <td>${user.phone || 'N/A'}</td>
+          <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${user.role}</span></td>
+          <td><span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+    
+    async function verifyPayment(bookingId, action) {
+      const confirmMessage = action === 'approve' ? 
+        'Are you sure you want to approve this payment?' : 
+        'Are you sure you want to reject this payment?';
+      
+      if (!confirm(confirmMessage)) return;
+      
+      try {
+        const status = action === 'approve' ? 'payment_verified' : 'pending_payment';
+        
+        await db.collection('bookings').doc(bookingId).update({
+          status: status,
+          paymentVerificationNotes: action === 'approve' ? 'Payment approved by admin' : 'Payment rejected by admin',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert(`Payment ${action}d successfully`);
+        await loadDashboardData();
+        
+      } catch (error) {
+        console.error('Error updating payment status:', error);
+        alert('Error updating payment status');
+      }
+    }
+    
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'pending_payment': return 'bg-warning text-dark';
+        case 'payment_submitted': return 'bg-info';
+        case 'payment_verified': return 'bg-success';
+        case 'confirmed': return 'bg-success';
+        case 'cancelled': return 'bg-danger';
+        default: return 'bg-secondary';
+      }
+    }
+    
+    function formatStatus(status) {
+      return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short'
+      });
+    }
+    
+    function viewBookingDetails(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId);
+      if (booking) {
+        alert(`Booking Details:\n\nID: ${booking.bookingId}\nCustomer: ${booking.userName}\nCar: ${booking.carName}\nAmount: ₹${booking.finalPrice}\nStatus: ${formatStatus(booking.status)}`);
+      }
+    }
+    
+    async function refreshBookings() {
+      await loadBookings();
+      calculateStats();
+      displayRecentBookings();
+      displayAllBookings();
+      displayPendingPayments();
+    }
+    
+    async function refreshUsers() {
+      await loadUsers();
+      calculateStats();
+      displayUsers();
+    }
+  </script>
+</body>
+</html>
