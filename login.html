@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - GoPanda Cars</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <div class="container-fluid vh-100">
+    <div class="row h-100">
+      <!-- Left Side - Image -->
+      <div class="col-lg-6 d-none d-lg-block p-0">
+        <div class="h-100 position-relative">
+          <img src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+               class="w-100 h-100 object-fit-cover" alt="Car">
+          <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center">
+            <div class="text-center text-white">
+              <i class="fas fa-car fa-4x mb-3"></i>
+              <h2 class="fw-bold">Welcome to GoPanda Cars</h2>
+              <p class="lead">Your journey begins here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Side - Form -->
+      <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
+        <div class="w-100" style="max-width: 400px;">
+          <div class="text-center mb-4">
+            <a href="index.html" class="text-decoration-none">
+              <i class="fas fa-car fa-3x text-primary mb-3"></i>
+              <h1 class="h3 fw-bold text-dark">GoPanda Cars</h1>
+            </a>
+          </div>
+          
+          <div class="card shadow-lg border-0">
+            <div class="card-body p-4">
+              <div class="text-center mb-4">
+                <h2 class="h4 fw-bold" id="formTitle">Sign In</h2>
+                <p class="text-muted" id="formSubtitle">Welcome back! Please sign in to your account</p>
+              </div>
+              
+              <div id="alertContainer"></div>
+              
+              <form id="authForm">
+                <!-- Email -->
+                <div class="mb-3">
+                  <label for="email" class="form-label">
+                    <i class="fas fa-envelope me-1"></i> Email Address
+                  </label>
+                  <input type="email" class="form-control" id="email" required>
+                </div>
+                
+                <!-- Password -->
+                <div class="mb-3">
+                  <label for="password" class="form-label">
+                    <i class="fas fa-lock me-1"></i> Password
+                  </label>
+                  <input type="password" class="form-control" id="password" required>
+                </div>
+                
+                <!-- Registration Fields (Hidden by default) -->
+                <div id="registrationFields" style="display: none;">
+                  <div class="mb-3">
+                    <label for="name" class="form-label">
+                      <i class="fas fa-user me-1"></i> Full Name
+                    </label>
+                    <input type="text" class="form-control" id="name">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="phone" class="form-label">
+                      <i class="fas fa-phone me-1"></i> Phone Number
+                    </label>
+                    <input type="tel" class="form-control" id="phone">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="address" class="form-label">
+                      <i class="fas fa-map-marker-alt me-1"></i> Address
+                    </label>
+                    <textarea class="form-control" id="address" rows="3"></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="driverLicense" class="form-label">
+                      <i class="fas fa-id-card me-1"></i> Driver's License (Optional)
+                    </label>
+                    <input type="text" class="form-control" id="driverLicense">
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mb-3" id="submitBtn">
+                  <i class="fas fa-sign-in-alt me-1"></i> Sign In
+                </button>
+              </form>
+              
+              <div class="text-center">
+                <p class="mb-0">
+                  <span id="toggleText">Don't have an account?</span>
+                  <button type="button" class="btn btn-link p-0 ms-1" id="toggleMode">Sign Up</button>
+                </p>
+                <a href="index.html" class="btn btn-outline-secondary btn-sm mt-2">
+                  <i class="fas fa-arrow-left me-1"></i> Back to Home
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let isLoginMode = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      setupLoginPage();
+    });
+    
+    function setupLoginPage() {
+      const toggleModeBtn = document.getElementById('toggleMode');
+      const authForm = document.getElementById('authForm');
+      
+      toggleModeBtn.addEventListener('click', toggleAuthMode);
+      authForm.addEventListener('submit', handleAuthSubmit);
+      
+      // Check if user is already logged in
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          window.location.href = 'index.html';
+        }
+      });
+    }
+    
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      
+      const formTitle = document.getElementById('formTitle');
+      const formSubtitle = document.getElementById('formSubtitle');
+      const toggleText = document.getElementById('toggleText');
+      const toggleMode = document.getElementById('toggleMode');
+      const submitBtn = document.getElementById('submitBtn');
+      const registrationFields = document.getElementById('registrationFields');
+      
+      if (isLoginMode) {
+        formTitle.textContent = 'Sign In';
+        formSubtitle.textContent = 'Welcome back! Please sign in to your account';
+        toggleText.textContent = "Don't have an account?";
+        toggleMode.textContent = 'Sign Up';
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-1"></i> Sign In';
+        registrationFields.style.display = 'none';
+        
+        // Remove required attribute from registration fields
+        document.getElementById('name').required = false;
+        document.getElementById('phone').required = false;
+        document.getElementById('address').required = false;
+      } else {
+        formTitle.textContent = 'Sign Up';
+        formSubtitle.textContent = 'Create your account to start booking cars';
+        toggleText.textContent = 'Already have an account?';
+        toggleMode.textContent = 'Sign In';
+        submitBtn.innerHTML = '<i class="fas fa-user-plus me-1"></i> Sign Up';
+        registrationFields.style.display = 'block';
+        
+        // Add required attribute to registration fields
+        document.getElementById('name').required = true;
+        document.getElementById('phone').required = true;
+        document.getElementById('address').required = true;
+      }
+      
+      // Clear form
+      document.getElementById('authForm').reset();
+      document.getElementById('alertContainer').innerHTML = '';
+    }
+    
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.innerHTML;
+      
+      if (!email || !password) {
+        showAlert('Please fill in all required fields', 'danger');
+        return;
+      }
+      
+      showLoading(submitBtn);
+      
+      try {
+        if (isLoginMode) {
+          const result = await loginUser(email, password);
+          if (result.success) {
+            window.location.href = 'index.html';
+          } else {
+            showAlert(result.error, 'danger');
+          }
+        } else {
+          const name = document.getElementById('name').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const address = document.getElementById('address').value.trim();
+          const driverLicense = document.getElementById('driverLicense').value.trim();
+          
+          if (!name || !phone || !address) {
+            showAlert('Please fill in all required fields', 'danger');
+            return;
+          }
+          
+          const userData = {
+            email,
+            password,
+            name,
+            phone,
+            address,
+            driverLicense
+          };
+          
+          const result = await registerUser(userData);
+          if (result.success) {
+            showAlert('Account created successfully! Redirecting...', 'success');
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 2000);
+          } else {
+            showAlert(result.error, 'danger');
+          }
+        }
+      } catch (error) {
+        console.error('Auth error:', error);
+        showAlert('An error occurred. Please try again.', 'danger');
+      } finally {
+        hideLoading(submitBtn, originalText);
+      }
+    }
+  </script>
+</body>
+</html>
